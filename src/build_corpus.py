@@ -2,32 +2,31 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR = Path("data")
-RAW_PATH = DATA_DIR / "raw" / "jobs.csv"      # your Kaggle file
+RAW_PATH = DATA_DIR / "raw" / "jobs.csv"
 OUT_PATH = DATA_DIR / "processed" / "corpus.csv"
 
 def build_corpus():
     df = pd.read_csv(RAW_PATH)
+    df.columns = df.columns.str.strip().str.lower()
 
-    # Basic cleaning of NaNs
-    df = df.fillna("")
-
-    # Build a synthetic "description" field
-    # You can tweak this template later
     texts = []
     for _, row in df.iterrows():
-        title = str(row["Title"]).strip()
-        skills = str(row["Skills"]).strip()
-        resp = str(row["Responsibility"]).strip()
+        title = str(row.get("title", "")).strip()
+        skills = str(row.get("skills", "")).strip()
+        resp = str(row.get("responsibilities", "")).strip()
 
-        text = f"We are hiring a {title}. The key skills required are {skills}. " \
-               f"In this role, you will {resp}."
+        text = (
+            f"We are hiring a {title}. "
+            f"The key skills required are {skills}. "
+            f"In this role, you will {resp}."
+        )
         texts.append(text)
 
     out_df = pd.DataFrame({
-        "job_id": df["JobID"],
-        "title": df["Title"],
-        "skills": df["Skills"],
-        "responsibility": df["Responsibility"],
+        "job_id": df.get("jobid", ""),
+        "title": df.get("title", ""),
+        "skills": df.get("skills", ""),
+        "responsibility": df.get("responsibilities", ""),
         "text": texts
     })
 

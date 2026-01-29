@@ -95,7 +95,8 @@ def train():
     # Save model
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(MODEL_DIR)
-    print("✅ Model saved to models/bert_ner")
+    tokenizer.save_pretrained(MODEL_DIR)
+    print("Model and tokenizer saved to models/bert_ner")
 
 
 if __name__ == "__main__":

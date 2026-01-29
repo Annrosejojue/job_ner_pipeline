@@ -3,9 +3,10 @@ from torch.utils.data import DataLoader
 from seqeval.metrics import classification_report
 import numpy as np
 import json
+import pickle
 from pathlib import Path
 from dataset import NERDataset
-from model import create_model
+from transformers import BertForTokenClassification
 
 DATA_DIR = Path("data/processed")
 MODEL_DIR = Path("models/bert_ner")
@@ -13,9 +14,13 @@ MODEL_DIR = Path("models/bert_ner")
 def evaluate():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    X_val = np.load(DATA_DIR / "X_val.npy", allow_pickle=True).item()
+    # Load encodings
+    with open(DATA_DIR / "X_val.pkl", "rb") as f:
+        X_val = pickle.load(f)
+
     y_val = np.load(DATA_DIR / "y_val.npy", allow_pickle=True)
 
+    # Label map
     with open(DATA_DIR / "label2id.json") as f:
         label2id = json.load(f)
     id2label = {v: k for k, v in label2id.items()}
@@ -23,8 +28,8 @@ def evaluate():
     val_dataset = NERDataset(X_val, y_val)
     val_loader = DataLoader(val_dataset, batch_size=8)
 
-    model = create_model(len(label2id))
-    model.load_state_dict(torch.load(MODEL_DIR / "pytorch_model.bin"))
+    # Load model the correct way
+    model = BertForTokenClassification.from_pretrained(MODEL_DIR)
     model.to(device)
     model.eval()
 

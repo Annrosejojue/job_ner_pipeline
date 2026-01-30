@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
-from transformers import get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup, BertTokenizerFast
 from pathlib import Path
 import numpy as np
 import json
@@ -14,6 +14,9 @@ MODEL_DIR = Path("models/bert_ner")
 BATCH_SIZE = 8
 EPOCHS = 4
 LR = 3e-5
+
+# Load tokenizer so we can save it later
+tokenizer = BertTokenizerFast.from_pretrained("bert-base-cased")
 
 
 def load_data():
@@ -92,11 +95,12 @@ def train():
         avg_loss = total_loss / len(train_loader)
         print(f"📘 Epoch {epoch+1}/{EPOCHS} — Loss: {avg_loss:.4f}")
 
-    # Save model
+    # Save model + tokenizer
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(MODEL_DIR)
     tokenizer.save_pretrained(MODEL_DIR)
-    print("Model and tokenizer saved to models/bert_ner")
+
+    print("✅ Model and tokenizer saved to models/bert_ner")
 
 
 if __name__ == "__main__":

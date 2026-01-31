@@ -9,3 +9,10 @@ The pipeline is modular, reproducible, and designed to support future evaluation
    micro avg       1.00      1.00      1.00      5517
    macro avg       1.00      1.00      1.00      5517
 weighted avg       1.00      1.00      1.00      5517
+
+LLM Validator Agent (Groq Llama‑3.1)
+Reads original text + BERT predictions
+Confirms correct skills
+Rejects false positives
+Adds missing skills
+Returns structured JSON
